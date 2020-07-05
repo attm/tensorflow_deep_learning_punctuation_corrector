@@ -10,5 +10,6 @@ setup(
                "encdec_model",
                "encdec_model_builder",
                "flask_app",
-               "tests"]
+               "tests",
+               "utils"]
 )
