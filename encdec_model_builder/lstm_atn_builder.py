@@ -27,8 +27,8 @@ def build(vocab_size : int = 20000, rnn_units : int = 256, dense_units : int = 1
     decoder_input = Input(shape=(None,))
 
     # Encoder & Decoder embedding layer (same for both)
-    e_embedding = tf.keras.layers.Embedding(vocab_size, rnn_units, mask_zero=False)
-    d_embedding = tf.keras.layers.Embedding(vocab_size, rnn_units, mask_zero=False)
+    e_embedding = tf.keras.layers.Embedding(vocab_size, rnn_units, mask_zero=True)
+    d_embedding = tf.keras.layers.Embedding(vocab_size, rnn_units, mask_zero=True)
 
     attention_layer = tf.keras.layers.AdditiveAttention
 

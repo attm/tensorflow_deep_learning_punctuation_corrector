@@ -89,8 +89,8 @@ def tokenize_sample_dataset(samples_dataset : list, tokenizer : Tokenizer) -> li
     Tokenizing given list of texts.
     
     Parameters:
-        samples_dataset (list) : list of str's that need to be tokenized
-        tokenizer (keras Tokenizer) : tokenizer that will tokenize dataset
+        samples_dataset (list) : list of str's that need to be tokenized.
+        tokenizer (keras Tokenizer) : tokenizer that will tokenize dataset.
     Returns:
         tokenized_sample_dataset (list) : tokenized dataset.
     """
@@ -98,7 +98,7 @@ def tokenize_sample_dataset(samples_dataset : list, tokenizer : Tokenizer) -> li
     return tokenized_sample_dataset
 
 @type_check
-def pad_sample_dataset(samples_dataset : list, maxlen : int = 32, padding : str = "post") -> list:
+def pad_sample_dataset(samples_dataset : list, maxlen : int = PAD_MAXLEN, padding : str = PAD_PADDING) -> list:
     """
     Padding given tokenized dataset.
 
