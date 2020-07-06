@@ -22,7 +22,9 @@ def pad_sentence(sentence : str, pad_symbols : list = PUNCTUATION_SYMBOLS) -> st
     """
     for symbol in pad_symbols:
         sentence = pad_symbol(sentence, symbol)
-    return remove_multiple_spaces(sentence)
+    sentence = sentence.rstrip()
+    sentence = remove_multiple_spaces(sentence)
+    return sentence
 
 @type_check
 def remove_punctuation_symbols(sentence : str, punctuation_symbols : list = PUNCTUATION_SYMBOLS) -> str:
@@ -37,7 +39,9 @@ def remove_punctuation_symbols(sentence : str, punctuation_symbols : list = PUNC
     """
     for symbol in punctuation_symbols:
         sentence = sentence.replace(symbol, " ")
-    return remove_multiple_spaces(sentence)
+    sentence = sentence.rstrip()
+    sentence = remove_multiple_spaces(sentence)
+    return sentence
 
 # ============ SAMPLES GENERATING ============ #
 @type_check
@@ -89,7 +93,7 @@ def generate_input2_sample(sentence : str, start_token : str = START_TOKEN, pad_
     Returns:
         Input2 sample.
     """
-    sentence = pad_symbol(sentence, symbol_to_pad=pad_symbols)
+    sentence = pad_sentence(sentence, pad_symbols=pad_symbols)
     sentence = start_token + " " + sentence
     sentence.lstrip()
     return sentence
@@ -107,7 +111,7 @@ def generate_target_sample(sentence : str, end_token : str = END_TOKEN, pad_symb
     Returns:
         Target sample.
     """
-    sentence = pad_symbol(sentence, symbol_to_pad=pad_symbols)
+    sentence = pad_sentence(sentence, pad_symbols=pad_symbols)
     sentence = sentence + " " + end_token
     sentence.lstrip()
     return sentence
