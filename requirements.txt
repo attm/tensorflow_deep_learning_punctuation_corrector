@@ -5,3 +5,4 @@ jupyter
 tensorflow_datasets
 flask
 pytest
+sklearn

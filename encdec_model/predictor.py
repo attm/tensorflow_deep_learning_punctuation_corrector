@@ -4,6 +4,7 @@ from corrector_dataset_builder.samples_generator import generate_input1_sample
 from corrector_dataset_builder.dataset_builder import pad_sample_dataset
 import numpy as np
 from utils.check_decorators import type_check
+import tensorflow as tf
 
 
 class EncDecPredictor():
@@ -55,7 +56,7 @@ class EncDecPredictor():
     # ============ PUBLIC ============ #
     def predict(self, sentence : str) -> str:
         sequence = self._sentence_to_sequence(sentence)
-        prediction_sequence = self._predict_sequence(sequence)
+        prediction_sequence = self._predict_sequence_keras(sequence)
         prediction_sentence = self.translate_sequence(prediction_sequence)
         return prediction_sentence
 
@@ -72,13 +73,12 @@ class EncDecPredictor():
         # Getting tokens numbers in word_index
         start_token = self.tokenizer.word_index[self.start_token]
         end_token = self.tokenizer.word_index[self.end_token]
-        # Reshaping sequence 
-        seq = sequence.reshape(1, self.pad_maxlen)
         # Making first prediction, getting state
-        state = self.encoder.predict(seq)
-        # Making dummy sequnece
-        target_seq = np.zeros(shape=(1, self.pad_maxlen))
-        target_seq[0, [0]] = start_token
+        state = self.encoder.predict(sequence)
+        # Generate empty target sequence of length 1.
+        target_seq = np.zeros((1, 1, 1))
+        # Populate the first character of target sequence with the start character.
+        target_seq[0, 0, 0] = start_token
         # Defining output that contains predicted words
         output = []
 
@@ -86,8 +86,10 @@ class EncDecPredictor():
         for i in range(self.pad_maxlen):
             # Decoding and making prediction
             yh, h, c = self.decoder.predict([target_seq] + state)
+            print(yh.shape)
             # Getting word from softmax dense output
             word_token = np.argmax(yh[0, 0, :])
+            print(word_token)
             # If word is end_token, braking cycle
             if word_token == end_token:
                 break
@@ -96,11 +98,50 @@ class EncDecPredictor():
             # Getting state
             state = [h, c]
             # Redefining new sequence and setting predicted word
-            target_seq = np.zeros(shape=(1, 32))
-            target_seq[0, [0]] = word_token
+            target_seq = np.zeros((1, 1, 1))
+            target_seq[0, 0, 0] = word_token
+
+        return output
+
+    def _predict_sequence_keras(self, sequence : np.ndarray) -> str:
+
+        # Getting tokens numbers in word_index
+        start_token = self.tokenizer.word_index[self.start_token]
+        end_token = self.tokenizer.word_index[self.end_token]
+        print("Start token is {0}, end token is {1}".format(start_token, end_token))
+        print("seq is {0}".format(sequence))
+
+        # Encode the input as state vectors.
+        states_value = self.encoder.predict(sequence)
+
+        # Generate empty target sequence of length 1.
+        target_seq = np.zeros((1, 1, 1))
+        # Populate the first character of target sequence with the start character.
+        target_seq[0, 0, 0] = start_token
+        print("\nTarget seq is:")
+        print(target_seq)
+        print(target_seq.shape)
+
+        output = []
+        for i in range(self.pad_maxlen):
+            output_tokens, h, c = self.decoder.predict(
+                [target_seq] + states_value)
+            
+            word_token = np.argmax(output_tokens[0, 0, :])
             print(word_token)
 
-        print(output)
+            if word_token == end_token:
+                print("END TOKEN")
+                break
+            
+            output.append(word_token)
+            target_seq = np.zeros((1, 1, 1))
+            target_seq[0, 0, 0] = word_token
+            print("\nPREDICTED target seq is:")
+            print(target_seq)
+
+            states_value = [h, c]
+
         return output
 
     def _sentence_to_sequence(self, sentence : str) -> np.ndarray:

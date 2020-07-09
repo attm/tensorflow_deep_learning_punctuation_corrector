@@ -57,7 +57,7 @@ data/
 *.npy
 
 # Models
-models/
+saved_models/
 
 # VS code
 .vscode/

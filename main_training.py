@@ -1,4 +1,4 @@
-from encdec_model_builder.lstm_atn_builder import build as build_lstm_atn
+from encdec_model_builder.lstm_simple_builder import build as build_lstm
 from encdec_model.predictor import EncDecPredictor
 from tensorflow.keras.preprocessing.text import Tokenizer
 import tensorflow as tf
@@ -6,19 +6,20 @@ from os.path import join as pjoin
 import os
 import numpy as np
 import pickle
+from sklearn.preprocessing import OneHotEncoder
 
 
 cwd = os.getcwd()
 DATA_FOLDER = pjoin(cwd, "data")
+SAVED_MODELS_FOLDER = pjoin(cwd, "saved_models")
 
 # Dataset consts
-SAMPLES_NUM = 5000
+SAMPLES_NUM = 500
 TRAIN_SPLIT = 0.8
 
 # Training consts
-EPOCHS = 5
-BATCH_SIZE = 32
-
+EPOCHS = 300
+BATCH_SIZE = 8
 
 # Preparing GPU
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -68,10 +69,9 @@ def split_dataset(dataset : np.ndarray, head_count : int = -1, train_split : flo
     
     return train_dataset, test_dataset
 
-
 def main_train() -> None:
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-    model, encoder, decoder = build_lstm_atn(optimizer=optimizer, rnn_units=512, dense_units=1024)
+    tf.keras.backend.clear_session()
+    model, encoder, decoder = build_lstm(rnn_units=128, dense_units=512, vocab_size=20000)
 
     i1, i2, tg = load_datasets()
     tkn = load_tokenizer()
@@ -80,11 +80,12 @@ def main_train() -> None:
     i2_train, i2_test = split_dataset(i2, head_count=SAMPLES_NUM, train_split=TRAIN_SPLIT)
     tg_train, tg_test = split_dataset(tg, head_count=SAMPLES_NUM, train_split=TRAIN_SPLIT)
 
-    model.fit([i1_train, i2_train], tg_train, batch_size=BATCH_SIZE, epochs=EPOCHS, validation_data=([i1_test, i2_test], tg_test))
+    model.fit(x=[i1_train, i2_train], y=tg_train, batch_size=BATCH_SIZE, epochs=EPOCHS)
 
-    predictor = EncDecPredictor(encoder, decoder, tkn)
-    pred = predictor.predict("test prediction sentence")
-    print(pred)
+    model.save(pjoin(SAVED_MODELS_FOLDER, "composite"))
+    encoder.save(pjoin(SAVED_MODELS_FOLDER, "encoder"))
+    decoder.save(pjoin(SAVED_MODELS_FOLDER, "decoder"))
+
 
 if __name__ == "__main__":
     main_train()
