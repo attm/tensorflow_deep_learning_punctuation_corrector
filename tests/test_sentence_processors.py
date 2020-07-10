@@ -1,5 +1,5 @@
 import pytest
-from corrector_dataset_builder.sentence_processors import pad_symbol, remove_multiple_spaces
+from corrector_dataset_builder.sentence_processors import pad_symbol, remove_multiple_spaces, add_before_uppercase
 
 
 # ============ PAD_SYMBOL TEST ============ #
@@ -16,3 +16,7 @@ def test_pad_symbol():
 # ============ REMOVE_MULTIPLE_SPACES TEST ============ #
 def test_remove_multiple_spaces():
     assert remove_multiple_spaces("     Test     string   .   ") == " Test string . "
+
+# ============ ADD_BEFORE_UPPERCASE TEST ============ #
+def test_add_before_uppercase():
+    assert add_before_uppercase("This is Test", "<test> ") == "<test> This is <test> Test"

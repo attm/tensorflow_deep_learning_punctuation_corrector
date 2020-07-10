@@ -1,14 +1,14 @@
-from corrector_dataset_builder.sentence_processors import pad_symbol, remove_multiple_spaces
+from corrector_dataset_builder.sentence_processors import pad_symbol, remove_multiple_spaces, add_before_uppercase
 from utils.check_decorators import type_check
-import re
 from config import dataset_builder_config
 
+import re
 
 PUNCTUATION_SYMBOLS = dataset_builder_config.DATASET_PUNCTUATION_SYMBOLS
 START_TOKEN = dataset_builder_config.DATASET_START_TOKEN
 END_TOKEN = dataset_builder_config.DATASET_END_TOKEN
 NUM_TOKEN = dataset_builder_config.DATASET_NUM_TOKEN
-CAPITAL_TOKEN = dataset_builder_config.DATASET_CAPITAL_TOKEN
+UPPERCASE_TOKEN = dataset_builder_config.DATASET_UPPERCASE_TOKEN
 
 
 # ============ SENTENCE_PROCESSING ============ #
@@ -84,7 +84,7 @@ def generate_input1_sample(sentence : str, punctuation_symbols : list = PUNCTUAT
     return sentence
 
 @type_check
-def generate_input2_sample(sentence : str, start_token : str = START_TOKEN, pad_symbols : list = PUNCTUATION_SYMBOLS) -> str:
+def generate_input2_sample(sentence : str, start_token : str = START_TOKEN, uppercase_token : str = UPPERCASE_TOKEN, pad_symbols : list = PUNCTUATION_SYMBOLS) -> str:
     """
     Generates input2-like sentence, by padding it and adding start token at the start.
     Input2-like sentences are correct sentences that will be used for teacher forcing.
@@ -97,12 +97,14 @@ def generate_input2_sample(sentence : str, start_token : str = START_TOKEN, pad_
         Input2 sample.
     """
     sentence = pad_sentence(sentence, pad_symbols=pad_symbols)
+    sentence = add_before_uppercase(sentence, add_str=uppercase_token + " ")
     sentence = start_token + " " + sentence
+    sentence = sentence.lower()
     sentence.lstrip()
     return sentence
 
 @type_check
-def generate_target_sample(sentence : str, end_token : str = END_TOKEN, pad_symbols : list = PUNCTUATION_SYMBOLS) -> str:
+def generate_target_sample(sentence : str, end_token : str = END_TOKEN, uppercase_token : str = UPPERCASE_TOKEN, pad_symbols : list = PUNCTUATION_SYMBOLS) -> str:
     """
     Generates target-like sentence, by padding it and adding end token.
     Target sentences are correct sentences that will be used for model fitting.
@@ -115,26 +117,22 @@ def generate_target_sample(sentence : str, end_token : str = END_TOKEN, pad_symb
         Target sample.
     """
     sentence = pad_sentence(sentence, pad_symbols=pad_symbols)
+    sentence = add_before_uppercase(sentence, add_str=uppercase_token + " ")
     sentence = sentence + " " + end_token
+    sentence = sentence.lower()
     sentence.lstrip()
     return sentence
 
 @type_check
-def generate_tokenizer_sample(input1_sentence : str, target_sentence : str, start_token : str = START_TOKEN) -> str:
+def generate_tokenizer_sample(target_sentence : str, start_token : str = START_TOKEN) -> str:
     """
-    Generates sample for tokenizer fitting by combining input1 and target sentences and adding start token.
-    That is needed for giving full information of all words variants for tokenizer.
+    Generates sample for tokenizer fitting by simply adding start token for target sentence, so tokenizer will ger all symbols.
 
     Parameters:
-        input1_sentence (str) : Input1 sentence, lowercase with mistakes.
         target_sentence (str) : Target sentence, correct with end token.
         start_token (str) : Start token that will be added.
     Returns:
         Combined sample for tokenizer fitting.
     """
-    target_words_set = wordList = set(re.sub("[?]", " ",  target_sentence).split())
-    input1_words_list = re.sub("[?]", " ",  input1_sentence).split()
-    target_words_set.update(input1_words_list)
-    tokenizer_sentence = " ".join(target_words_set)
-    tokenizer_sentence = start_token + " " + tokenizer_sentence
+    tokenizer_sentence = target_sentence + " " + start_token
     return tokenizer_sentence
