@@ -1,11 +1,14 @@
 from corrector_dataset_builder.sentence_processors import pad_symbol, remove_multiple_spaces
 from utils.check_decorators import type_check
 import re
+from config import dataset_builder_config
 
 
-PUNCTUATION_SYMBOLS = [",", ".", "?", "!", ";", ":", "-"]
-START_TOKEN = "<s>"
-END_TOKEN = "<e>"
+PUNCTUATION_SYMBOLS = dataset_builder_config.DATASET_PUNCTUATION_SYMBOLS
+START_TOKEN = dataset_builder_config.DATASET_START_TOKEN
+END_TOKEN = dataset_builder_config.DATASET_END_TOKEN
+NUM_TOKEN = dataset_builder_config.DATASET_NUM_TOKEN
+CAPITAL_TOKEN = dataset_builder_config.DATASET_CAPITAL_TOKEN
 
 
 # ============ SENTENCE_PROCESSING ============ #

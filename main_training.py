@@ -1,12 +1,14 @@
 from encdec_model_builder.lstm_simple_builder import build as build_lstm
 from encdec_model.predictor import EncDecPredictor
 from tensorflow.keras.preprocessing.text import Tokenizer
-import tensorflow as tf
 from os.path import join as pjoin
-import os
-import numpy as np
+from config import training_config
+
+import os 
 import pickle
-from sklearn.preprocessing import OneHotEncoder
+
+import tensorflow as tf
+import numpy as np
 
 
 cwd = os.getcwd()

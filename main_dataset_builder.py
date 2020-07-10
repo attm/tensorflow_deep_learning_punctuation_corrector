@@ -18,7 +18,7 @@ def rebuild_datasets():
     texts_list = texts.tolist()
 
     # Building datasets
-    i1, i2, tg, tokenizer = build_from_sentences(texts_list, num_words=20000, pad_maxlen=32)
+    i1, i2, tg, tokenizer = build_from_sentences(texts_list)
 
     # Saving datasets
     np.save(pjoin(DATA_FOLDER, "input1.npy"), i1)

@@ -3,15 +3,16 @@ from utils.check_decorators import type_check
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import numpy as np
+from config import dataset_builder_config
 
 # TOKENIZER CONST
-TOKENIZER_NUM_WORDS = 10000
-TOKENIZER_OOV = "oov"
-TOKENIZER_FILTERS = '"#$%&()*+-/=@[\\]^_{|}~\t\n'
+TOKENIZER_NUM_WORDS = dataset_builder_config.TOKENIZER_NUM_WORDS
+TOKENIZER_OOV = dataset_builder_config.TOKENIZER_OOV_TOKEN
+TOKENIZER_FILTERS = dataset_builder_config.TOKENIZER_FILTER
 
 # PAD SEQUENCES CONST
-PAD_MAXLEN = 32
-PAD_PADDING = "post"
+PAD_MAXLEN = dataset_builder_config.PAD_SEQUENCE_MAXLEN
+PAD_PADDING = dataset_builder_config.PAD_SEQUENCE_PADDING
 
 @type_check
 def build_from_sentences(sentences : list, tokenizer : Tokenizer = None, num_words : int = TOKENIZER_NUM_WORDS, pad_maxlen : int = PAD_MAXLEN, padding : str = PAD_PADDING) -> np.ndarray:

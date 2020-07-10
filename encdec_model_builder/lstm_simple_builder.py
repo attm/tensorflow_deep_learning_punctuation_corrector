@@ -31,7 +31,7 @@ def build(vocab_size : int = 20000, rnn_units : int = 256, dense_units : int = 1
     decoder_embedding = Embedding(vocab_size, rnn_units, input_length=seq_lenght, mask_zero=False)
     decoder = decoder_embedding(decoder_inputs)
 
-    # Decoder LSTM
+    # Decoder LSTM, rnn_units * 2 because encoder LSTM is bidirectional
     decoder_lstm = LSTM(rnn_units * 2, return_sequences=True, return_state=True)
     decoder_outputs, _, _ = decoder_lstm(decoder,
                                         initial_state=encoder_states)
