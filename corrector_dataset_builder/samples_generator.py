@@ -63,7 +63,7 @@ def generate_samples(sentence : str) -> str:
     input1_sentence = generate_input1_sample(sentence)
     input2_sentence = generate_input2_sample(sentence)
     target_sentence = generate_target_sample(sentence)
-    tokenizer_sentence = generate_tokenizer_sample(input1_sentence, target_sentence)
+    tokenizer_sentence = generate_tokenizer_sample(target_sentence, START_TOKEN)
     return input1_sentence, input2_sentence, target_sentence, tokenizer_sentence
 
 @type_check

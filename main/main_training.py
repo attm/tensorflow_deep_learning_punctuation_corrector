@@ -2,7 +2,7 @@ from encdec_model_builder.lstm_simple_builder import build as build_lstm
 from encdec_model.predictor import EncDecPredictor
 from tensorflow.keras.preprocessing.text import Tokenizer
 from os.path import join as pjoin
-from config import training_config
+from config import training_config, dataset_builder_config
 
 import os 
 import pickle
@@ -20,8 +20,8 @@ SAMPLES_NUM = 500
 TRAIN_SPLIT = 0.8
 
 # Training consts
-EPOCHS = 300
-BATCH_SIZE = 8
+EPOCHS = 150
+BATCH_SIZE = 32
 
 # Preparing GPU
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -73,7 +73,7 @@ def split_dataset(dataset : np.ndarray, head_count : int = -1, train_split : flo
 
 def main_train() -> None:
     tf.keras.backend.clear_session()
-    model, encoder, decoder = build_lstm(rnn_units=128, dense_units=512, vocab_size=20000)
+    model, encoder, decoder = build_lstm(rnn_units=128, dense_units=512, vocab_size=dataset_builder_config.TOKENIZER_NUM_WORDS)
 
     i1, i2, tg = load_datasets()
     tkn = load_tokenizer()

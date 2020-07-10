@@ -1,0 +1,25 @@
+textarea.input_text_area{
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  resize: none;
+}
+
+p.form_title {
+  margin: auto;
+  width: 50%;
+  text-align: center;
+}
+
+p.button {
+  margin: auto;
+  width: 50%;
+  text-align: center;
+}
+
+p.output_form {
+  padding-top: 10%;
+  margin: auto;
+  width: 50%;
+  text-align: center;
+}

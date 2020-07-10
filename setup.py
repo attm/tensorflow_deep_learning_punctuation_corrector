@@ -12,5 +12,6 @@ setup(
                "flask_app",
                "tests",
                "utils",
-               "config"]
+               "config",
+               "main"]
 )

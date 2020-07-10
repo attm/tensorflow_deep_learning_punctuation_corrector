@@ -69,40 +69,6 @@ class EncDecPredictor():
         return translated_sentence
 
     # ============ PRIVATE ============ #
-    def _predict_sequence(self, sequence : np.ndarray) -> str:
-        # Getting tokens numbers in word_index
-        start_token = self.tokenizer.word_index[self.start_token]
-        end_token = self.tokenizer.word_index[self.end_token]
-        # Making first prediction, getting state
-        state = self.encoder.predict(sequence)
-        # Generate empty target sequence of length 1.
-        target_seq = np.zeros((1, 1, 1))
-        # Populate the first character of target sequence with the start character.
-        target_seq[0, 0, 0] = start_token
-        # Defining output that contains predicted words
-        output = []
-
-        # Itterating and making predictions, saving last predicted words and use it for the next prediction
-        for i in range(self.pad_maxlen):
-            # Decoding and making prediction
-            yh, h, c = self.decoder.predict([target_seq] + state)
-            print(yh.shape)
-            # Getting word from softmax dense output
-            word_token = np.argmax(yh[0, 0, :])
-            print(word_token)
-            # If word is end_token, braking cycle
-            if word_token == end_token:
-                break
-            # Appending output with new predicted word
-            output.append(word_token)
-            # Getting state
-            state = [h, c]
-            # Redefining new sequence and setting predicted word
-            target_seq = np.zeros((1, 1, 1))
-            target_seq[0, 0, 0] = word_token
-
-        return output
-
     def _predict_sequence_keras(self, sequence : np.ndarray) -> str:
 
         # Getting tokens numbers in word_index
