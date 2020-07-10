@@ -1,6 +1,7 @@
 from tensorflow.keras import Model
 from tensorflow.keras import Input
 from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Embedding, TimeDistributed
+from tensorflow.keras.layers import concatenate
 import tensorflow as tf
 
 
@@ -14,8 +15,11 @@ def build(vocab_size : int = 20000, rnn_units : int = 256, dense_units : int = 1
     encoder = encoder_embedding(encoder_inputs)
 
     # Encoder LSTM, getting states and passing it to decoder LSTM
-    encoder_lstm = LSTM(rnn_units, return_state=True)
-    encoder_outputs, state_h, state_c = encoder_lstm(encoder)
+    encoder_lstm = Bidirectional(LSTM(rnn_units, return_state=True))
+    encoder_outputs, forward_state_h, forward_state_c, backward_state_h, backward_state_c = encoder_lstm(encoder)
+    # Concatenating states from bidirectional LSTM layer
+    state_h = concatenate([forward_state_h, backward_state_h])
+    state_c = concatenate([forward_state_c, backward_state_c])
     # Saving encoder LSTM states
     encoder_states = [state_h, state_c]
 
@@ -28,7 +32,7 @@ def build(vocab_size : int = 20000, rnn_units : int = 256, dense_units : int = 1
     decoder = decoder_embedding(decoder_inputs)
 
     # Decoder LSTM
-    decoder_lstm = LSTM(rnn_units, return_sequences=True, return_state=True)
+    decoder_lstm = LSTM(rnn_units * 2, return_sequences=True, return_state=True)
     decoder_outputs, _, _ = decoder_lstm(decoder,
                                         initial_state=encoder_states)
     
@@ -47,8 +51,8 @@ def build(vocab_size : int = 20000, rnn_units : int = 256, dense_units : int = 1
 
     # ============ DECODER MODEL FOR INFERENCE ============ #
     # Inference Decoder input states for LSTM layer
-    decoder_state_input_h = Input(shape=(rnn_units,))
-    decoder_state_input_c = Input(shape=(rnn_units,))
+    decoder_state_input_h = Input(shape=(rnn_units * 2,))
+    decoder_state_input_c = Input(shape=(rnn_units * 2,))
     decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
 
     # Inference Decoder embedding

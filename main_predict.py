@@ -31,7 +31,7 @@ def main():
 
     predictor = EncDecPredictor(enc, dec, tkn)
 
-    sentence = "i will show"
+    sentence = "i don't know if i have a time"
 
     print(predictor.predict(sentence))
 
