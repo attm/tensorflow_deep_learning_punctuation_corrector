@@ -1,5 +1,5 @@
 import pytest
-from corrector_dataset_builder.sentence_processors import pad_symbol, remove_multiple_spaces, add_before_uppercase
+from corrector_dataset_builder.sentence_processors import pad_symbol, remove_multiple_spaces, add_before_uppercase, token_to_uppercase
 
 
 # ============ PAD_SYMBOL TEST ============ #
@@ -20,3 +20,7 @@ def test_remove_multiple_spaces():
 # ============ ADD_BEFORE_UPPERCASE TEST ============ #
 def test_add_before_uppercase():
     assert add_before_uppercase("This is Test", "<test> ") == "<test> This is <test> Test"
+
+# ============ TOKEN_TO_UPPERCASE TEST ============ #
+def test_token_to_uppercase():
+    assert token_to_uppercase("<test> this is <test> test", "<test> ") == "This is Test"
