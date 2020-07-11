@@ -1,10 +1,11 @@
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras import Model
+import numpy as np
+import tensorflow as tf
 from corrector_dataset_builder.samples_generator import generate_input1_sample
 from corrector_dataset_builder.dataset_builder import pad_sample_dataset
-import numpy as np
 from utils.check_decorators import type_check
-import tensorflow as tf
+
 
 
 class EncDecPredictor():
@@ -70,7 +71,6 @@ class EncDecPredictor():
 
     # ============ PRIVATE ============ #
     def _predict_sequence_keras(self, sequence : np.ndarray) -> str:
-
         # Getting tokens numbers in word_index
         start_token = self.tokenizer.word_index[self.start_token]
         end_token = self.tokenizer.word_index[self.end_token]
@@ -78,7 +78,7 @@ class EncDecPredictor():
         print("seq is {0}".format(sequence))
 
         # Encode the input as state vectors.
-        states_value = self.encoder.predict(sequence)
+        states_value, encoder_outputs = self.encoder.predict(sequence)
 
         # Generate empty target sequence of length 1.
         target_seq = np.zeros((1, 1, 1))
@@ -90,8 +90,7 @@ class EncDecPredictor():
 
         output = []
         for i in range(self.pad_maxlen):
-            output_tokens, h, c = self.decoder.predict(
-                [target_seq] + states_value)
+            output_tokens, h, c = self.decoder.predict([target_seq, states_value, encoder_outputs])
             
             word_token = np.argmax(output_tokens[0, 0, :])
             print(word_token)

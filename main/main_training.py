@@ -14,14 +14,17 @@ import numpy as np
 cwd = os.getcwd()
 DATA_FOLDER = pjoin(cwd, "data")
 SAVED_MODELS_FOLDER = pjoin(cwd, "saved_models")
+COMPLETE_MODELS_FOLDER = pjoin(SAVED_MODELS_FOLDER, "complete_models")
+COMPOSITE_MODEL_CHECKPOINT_PATH = pjoin(SAVED_MODELS_FOLDER, "model_checkpoints", "composite_model", "checkpoint.ckpt")
 
 # Dataset consts
-SAMPLES_NUM = 500
+SAMPLES_NUM = 20000
 TRAIN_SPLIT = 0.8
 
 # Training consts
-EPOCHS = 150
-BATCH_SIZE = 32
+EPOCHS = 5
+BATCH_SIZE = 64
+USE_CHECKPOINT = True
 
 # Preparing GPU
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -73,20 +76,38 @@ def split_dataset(dataset : np.ndarray, head_count : int = -1, train_split : flo
 
 def main_train() -> None:
     tf.keras.backend.clear_session()
-    model, encoder, decoder = build_lstm(rnn_units=128, dense_units=512, vocab_size=dataset_builder_config.TOKENIZER_NUM_WORDS)
+    model, encoder, decoder = build_lstm(rnn_units=256, dense_units=512, vocab_size=dataset_builder_config.TOKENIZER_NUM_WORDS)
+
+    print(model.summary())
+    print(encoder.summary())
+    print(decoder.summary())
 
     i1, i2, tg = load_datasets()
     tkn = load_tokenizer()
 
-    i1_train, i1_test = split_dataset(i1, head_count=SAMPLES_NUM, train_split=TRAIN_SPLIT)
-    i2_train, i2_test = split_dataset(i2, head_count=SAMPLES_NUM, train_split=TRAIN_SPLIT)
-    tg_train, tg_test = split_dataset(tg, head_count=SAMPLES_NUM, train_split=TRAIN_SPLIT)
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=COMPOSITE_MODEL_CHECKPOINT_PATH,
+                                                    save_best_only=True,
+                                                    save_weights_only=True)
 
-    model.fit(x=[i1_train, i2_train], y=tg_train, batch_size=BATCH_SIZE, epochs=EPOCHS)
+    callbacks=[cp_callback]
 
-    model.save(pjoin(SAVED_MODELS_FOLDER, "composite"))
-    encoder.save(pjoin(SAVED_MODELS_FOLDER, "encoder"))
-    decoder.save(pjoin(SAVED_MODELS_FOLDER, "decoder"))
+    if USE_CHECKPOINT:
+        cp_dirname = os.path.dirname(COMPOSITE_MODEL_CHECKPOINT_PATH)
+        if os.path.exists(cp_dirname):
+            model.load_weights(COMPOSITE_MODEL_CHECKPOINT_PATH)
+            print("Loaded checkpoint from {0}".format(COMPOSITE_MODEL_CHECKPOINT_PATH))
+        else:
+            print("Checkpoint path not exists.")
+
+    model.fit(  x=[i1[:SAMPLES_NUM], i2[:SAMPLES_NUM]],
+                y=tg[:SAMPLES_NUM], 
+                batch_size=BATCH_SIZE, 
+                epochs=EPOCHS,
+                validation_split=0.2, 
+                callbacks=callbacks)
+
+    encoder.save(pjoin(COMPLETE_MODELS_FOLDER, "encoder"))
+    decoder.save(pjoin(COMPLETE_MODELS_FOLDER, "decoder"))
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
 
 
 cwd = os.getcwd()
-SAVED_MODELS_FOLDER = pjoin(cwd, "saved_models")
+SAVED_MODELS_FOLDER = pjoin(cwd, "saved_models", "complete_models")
 ENCODER_MODEL_NAME = "encoder"
 DECODER_MODEL_NAME = "decoder"
 TOKENIZER_PATH = pjoin(cwd, "data", "tokenizer.pickle")
