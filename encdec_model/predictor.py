@@ -71,7 +71,8 @@ class EncDecPredictor():
         # listToStr = ' '.join([str(elem) for elem in words if elem is not None])
         # return listToStr
         translated_sentence = self.tokenizer.sequences_to_texts([sequence])
-        translated_sentence = token_to_uppercase(str(translated_sentence), UPPERCASE_TOKEN + " ")
+        translated_sentence = "".join([str(word) for word in translated_sentence if word is not None])
+        translated_sentence = token_to_uppercase(translated_sentence, UPPERCASE_TOKEN + " ")
         return translated_sentence
 
     # ============ PRIVATE ============ #
@@ -79,37 +80,31 @@ class EncDecPredictor():
         # Getting tokens numbers in word_index
         start_token = self.tokenizer.word_index[self.start_token]
         end_token = self.tokenizer.word_index[self.end_token]
-        print("Start token is {0}, end token is {1}".format(start_token, end_token))
-        print("seq is {0}".format(sequence))
-
+        
         # Encode the input as state vectors.
         states_value, encoder_outputs = self.encoder.predict(sequence)
 
         # Generate empty target sequence of length 1.
         target_seq = np.zeros((1, 1, 1))
-        # Populate the first character of target sequence with the start character.
+        # Populate the first character of target sequence with the start token.
         target_seq[0, 0, 0] = start_token
-        print("\nTarget seq is:")
-        print(target_seq)
-        print(target_seq.shape)
 
         output = []
         for i in range(self.pad_maxlen):
+            # Predicting sequnece, getting prediction (dense softmax output) and states
+            # Inputs are sequence, states from encoder or from previous prediction, and encoder_outputs for attention
             output_tokens, h, c = self.decoder.predict([target_seq, states_value, encoder_outputs])
-            
+            # Getting word token from dense softmax output
             word_token = np.argmax(output_tokens[0, 0, :])
-            print(word_token)
-
+            # Break if sequnece end
             if word_token == end_token:
-                print("END TOKEN")
                 break
-            
+            # Saving predicted word
             output.append(word_token)
+            # Remaking sequnece
             target_seq = np.zeros((1, 1, 1))
             target_seq[0, 0, 0] = word_token
-            print("\nPREDICTED target seq is:")
-            print(target_seq)
-
+            # Saving state for next iteration
             states_value = [h, c]
 
         return output
