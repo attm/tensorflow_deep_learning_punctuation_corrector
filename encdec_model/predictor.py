@@ -4,8 +4,12 @@ import numpy as np
 import tensorflow as tf
 from corrector_dataset_builder.samples_generator import generate_input1_sample
 from corrector_dataset_builder.dataset_builder import pad_sample_dataset
+from corrector_dataset_builder.sentence_processors import token_to_uppercase
 from utils.check_decorators import type_check
+from config import dataset_builder_config
 
+
+UPPERCASE_TOKEN = dataset_builder_config.DATASET_UPPERCASE_TOKEN
 
 
 class EncDecPredictor():
@@ -67,6 +71,7 @@ class EncDecPredictor():
         # listToStr = ' '.join([str(elem) for elem in words if elem is not None])
         # return listToStr
         translated_sentence = self.tokenizer.sequences_to_texts([sequence])
+        translated_sentence = token_to_uppercase(str(translated_sentence), UPPERCASE_TOKEN + " ")
         return translated_sentence
 
     # ============ PRIVATE ============ #

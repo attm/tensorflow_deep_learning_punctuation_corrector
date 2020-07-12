@@ -62,6 +62,7 @@ def add_before_uppercase(string : str, add_str : str) -> str:
     string = re.sub(r"([A-Z])", r"{0}\1".format(add_str), string)
     return string
 
+@type_check
 def token_to_uppercase(string : str, uppercase_token : str) -> str:
     """
     Finds all tokenst and makes next characters uppercase.
@@ -73,8 +74,8 @@ def token_to_uppercase(string : str, uppercase_token : str) -> str:
         String with added add_str strings.
     """
     # Matching patter "token + letter", getting last char of string (letter), uppercase it
-    token_plus_letter = re.match(r"({0})([a-z])".format(uppercase_token), string)
-    if token_plus_letter is not None or "":
-        token_plus_letter = token_plus_letter.group(0)[-1].upper()
-        string = re.sub(r"({0})([a-z])".format(uppercase_token), token_plus_letter, string)
+    token_plus_letter = re.findall(r"({0})([a-z])".format(uppercase_token), string)
+    for token_letter in token_plus_letter:
+        char = token_letter[1]
+        string = re.sub(r"({0})({1})".format(uppercase_token, char), char.upper(), string)
     return string

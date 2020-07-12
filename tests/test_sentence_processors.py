@@ -23,4 +23,4 @@ def test_add_before_uppercase():
 
 # ============ TOKEN_TO_UPPERCASE TEST ============ #
 def test_token_to_uppercase():
-    assert token_to_uppercase("<test> this is <test> test", "<test> ") == "This is Test"
+    assert token_to_uppercase("<test> this is <test> upper", "<test> ") == "This is Upper"
