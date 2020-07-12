@@ -10,6 +10,10 @@ from config import dataset_builder_config
 
 
 UPPERCASE_TOKEN = dataset_builder_config.DATASET_UPPERCASE_TOKEN
+START_TOKEN = dataset_builder_config.DATASET_START_TOKEN
+END_TOKEN = dataset_builder_config.DATASET_END_TOKEN
+PAD_MAXLEN = dataset_builder_config.PAD_SEQUENCE_MAXLEN
+PAD_PADDING = dataset_builder_config.PAD_SEQUENCE_PADDING
 
 
 class EncDecPredictor():
@@ -17,10 +21,10 @@ class EncDecPredictor():
                     encoder : Model,
                     decoder : Model,
                     tokenizer : Tokenizer,
-                    pad_maxlen : int = 32,
-                    pad_padding : str = "post",
-                    start_token : str = "<s>",
-                    end_token : str = "<e>"):
+                    pad_maxlen : int = PAD_MAXLEN,
+                    pad_padding : str = PAD_PADDING,
+                    start_token : str = START_TOKEN,
+                    end_token : str = END_TOKEN):
         # Checking and setting components
         if not isinstance(encoder, Model):
             raise TypeError("Can't set encoder, expected tf.keras Model, got {0}".format(type(encoder)))
