@@ -18,11 +18,11 @@ COMPLETE_MODELS_FOLDER = pjoin(SAVED_MODELS_FOLDER, "complete_models")
 COMPOSITE_MODEL_CHECKPOINT_PATH = pjoin(SAVED_MODELS_FOLDER, "model_checkpoints", "composite_model", "checkpoint.ckpt")
 
 # Dataset consts
-SAMPLES_NUM = 500
+SAMPLES_NUM = 1000000
 TRAIN_SPLIT = 0.8
 
 # Training consts
-EPOCHS = 2
+EPOCHS = 5
 BATCH_SIZE = 64
 USE_CHECKPOINT = True
 
